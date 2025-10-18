@@ -65,11 +65,12 @@ def main():
     print("Type 'cookie' to feed the monster.")
     try:
         while True:
+            if counter >= 2:
+                os.fork()
             line = input("> ")
             cmd = line.strip().lower()
             if cmd == "cookie":
                 cookie_proc()
-                os.fork()
             elif cmd == "fork you":
                 sys.exit(0)
             elif cmd == "":
