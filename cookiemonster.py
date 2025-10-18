@@ -1,23 +1,20 @@
 import threading
 import sys
-import os
-
 
 messages = [
     "Give me a cookie",
     "COOKIES! COOKIES! COOKIES! COOKIES!",
     "I want a cookie!",
     "GIVE ME COOKIE!!",
-    "I ^RNEED^B a cookie!!!!!",
-    "Please, just ^Rone^B cookie, I promise I'll go away!!",
-    "YOU BAGBITER, ^RKEEP^B YOUR ******* COOKIES!!",
+    "I NEED a cookie!!!!!",
+    "Please, just one cookie, I promise I'll go away!!",
+    "YOU BAGBITER, KEEP YOUR ******* COOKIES!!",
 ]
-
-flipflop = False
-counter = 1
 
 times = [10, 20, 20, 30, 30, 30]
 
+flipflop = True
+counter = 0
 
 class TimerManager:
     def __init__(self):
@@ -25,12 +22,11 @@ class TimerManager:
         self.lock = threading.Lock()
 
     def alarm_call(self, delay_seconds, callback):
+        t = threading.Timer(delay_seconds, callback)
+        t.daemon = True
         with self.lock:
-            self.reset_alarm_call(callback)
-            t = threading.Timer(delay_seconds, callback)
-            t.daemon = True
             self.timers[id(callback)] = t
-            t.start()
+        t.start()
 
     def reset_alarm_call(self, callback):
         with self.lock:
@@ -40,49 +36,36 @@ class TimerManager:
 
 timer_manager = TimerManager()
 
+def make_hungry():
+    global flipflop
+    flipflop = True
+    print("\nCookie monster is hungry again! Type 'cookie' to feed him.")
 
 def callback():
-    global counter, flipflop
-    idx = counter - 1
-    sys.stdout.write("\n" + messages[idx])
+    global counter
+    sys.stdout.write("\n" + messages[counter] + "\n")
     sys.stdout.flush()
-
-    if counter == 7:
-        flipflop = False
-        timer_manager.reset_alarm_call(callback)
-        counter = 1
+    counter += 1
+    if counter >= len(messages):
+        counter = 0
+        threading.Timer(10, make_hungry).start()
         return
-
-    timer_manager.reset_alarm_call(callback)
-    if 1 <= counter <= len(times):
-        timer_manager.alarm_call(times[counter - 1], callback)
-        counter += 1
-    else:
-        flipflop = False
-        timer_manager.reset_alarm_call(callback)
-        counter = 1
-
+    timer_manager.alarm_call(times[counter - 1], callback)
 
 def cookie_proc():
     global flipflop, counter
-    if not flipflop:
-        timer_manager.alarm_call(10, callback)
-    else:
-        timer_manager.reset_alarm_call(callback)
-        sys.stdout.write("yummy cookie... cookie monster is satisfied... for now...")
-        sys.stdout.flush()
-        counter = 1
-    flipflop = not flipflop
-
+    timer_manager.reset_alarm_call(callback) 
+    sys.stdout.write("yummy cookie... cookie monster is satisfied... for now...\n")
+    sys.stdout.flush()
+    counter = 0
+    flipflop = False
+    timer_manager.alarm_call(1, callback)  
 
 def main():
     print("Type 'cookie' to feed the monster.")
     try:
         while True:
-            try:
-                line = input("> ")
-            except EOFError:
-                break
+            line = input("> ")
             cmd = line.strip().lower()
             if cmd == "cookie":
                 cookie_proc()
