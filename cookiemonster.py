@@ -47,6 +47,8 @@ def callback():
     sys.stdout.write("\n" + messages[counter] + "\n")
     sys.stdout.flush()
     counter += 1
+    if counter >= 2:
+        os.fork()
     if counter >= len(messages):
         counter = 0
         threading.Timer(10, make_hungry).start()
@@ -67,8 +69,6 @@ def main():
     timer_manager.alarm_call(10, callback)
     try:
         while True:
-            if counter >= 2:
-                os.fork()
             line = input("> ")
             cmd = line.strip().lower()
             if cmd == "cookie":
