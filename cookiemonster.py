@@ -59,14 +59,15 @@ def cookie_proc():
     sys.stdout.flush()
     counter = 0
     flipflop = False
-    timer_manager.alarm_call(1, callback)  
+    timer_manager.alarm_call(30, callback)  
 
 def main():
     print("Type 'cookie' to feed the monster.")
+    timer_manager.alarm_call(10, callback)
     try:
         while True:
-            if counter >= 2:
-                os.fork()
+            #if counter >= 2:
+            #    os.fork()
             line = input("> ")
             cmd = line.strip().lower()
             if cmd == "cookie":
