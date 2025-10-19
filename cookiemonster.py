@@ -1,3 +1,4 @@
+import os
 import threading
 import sys
 
@@ -66,8 +67,8 @@ def main():
     timer_manager.alarm_call(10, callback)
     try:
         while True:
-            #if counter >= 2:
-            #    os.fork()
+            if counter >= 2:
+                os.fork()
             line = input("> ")
             cmd = line.strip().lower()
             if cmd == "cookie":
