@@ -41,6 +41,7 @@ def make_hungry():
     global flipflop
     flipflop = True
     print("\nCookie monster is hungry again! Type 'cookie' to feed him.")
+    timer_manager.reset_alarm_call(callback)
 
 def callback():
     global counter
